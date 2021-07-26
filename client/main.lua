@@ -37,7 +37,7 @@ Citizen.CreateThread(function()
         local playerPed = PlayerPedId()
         local coords = GetEntityCoords(playerPed)
         if #(coords - Config.Shop.location) < 5.0 then
-            DrawMarker(0, Config.Shop.location.x, Config.Shop.location.y, Config.Shop.location.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, Config.Shop.marker.color.r, Config.Shop.marker.color.g, Config.Shop.marker.color.b, Config.Shop.marker.color.a, false, false, 2, nil, nil, false, false)
+            DrawMarker(Config.Shop.marker.type, Config.Shop.location.x, Config.Shop.location.y, Config.Shop.location.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, Config.Shop.marker.color.r, Config.Shop.marker.color.g, Config.Shop.marker.color.b, Config.Shop.marker.color.a, false, false, 2, nil, nil, false, false)
             if #(coords - Config.Shop.location) < 1.5 then
                 if IsControlJustReleased(1, 38) and not uiOpen then
                     OpenShop()
