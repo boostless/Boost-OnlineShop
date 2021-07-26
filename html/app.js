@@ -1,130 +1,39 @@
 var showing = false
 var s_Home = true
 var s_Adverts = false
+var s_Item = false
+var sItems = []
+var mItems = []
 
 $(function() {
     window.onload = (e) =>{
-      var sItems =[{
-        item: 'bread',
-        price: 10,
-        amount: 2,
-      },
-      {
-        item: 'cigarette',
-        price: 20,
-        amount: 30,
-      },
-      {
-        item: 'phone',
-        price: 5,
-        amount: 51,
-      },
-      {
-        item: 'beer',
-        price: 500,
-        amount: 22,
-      },
-      {
-        item: 'bread',
-        price: 10,
-        amount: 2,
-      },
-      {
-        item: 'cigarette',
-        price: 20,
-        amount: 30,
-      },
-      {
-        item: 'phone',
-        price: 5,
-        amount: 51,
-      },
-      {
-        item: 'beer',
-        price: 500,
-        amount: 22,
-      },
-      {
-        item: 'bread',
-        price: 10,
-        amount: 2,
-      },
-      {
-        item: 'cigarette',
-        price: 20,
-        amount: 30,
-      },
-      {
-        item: 'phone',
-        price: 5,
-        amount: 51,
-      },
-      {
-        item: 'beer',
-        price: 500,
-        amount: 22,
-      },
-      {
-        item: 'bread',
-        price: 10,
-        amount: 2,
-      },
-      {
-        item: 'cigarette',
-        price: 20,
-        amount: 30,
-      },
-      {
-        item: 'phone',
-        price: 5,
-        amount: 51,
-      },
-      {
-        item: 'beer',
-        price: 500,
-        amount: 22,
-      },
-      {
-        item: 'bread',
-        price: 10,
-        amount: 2,
-      },
-      {
-        item: 'cigarette',
-        price: 20,
-        amount: 30,
-      },
-      {
-        item: 'phone',
-        price: 5,
-        amount: 51,
-      },
-      {
-        item: 'beer',
-        price: 500,
-        amount: 22,
-      },
-    ]
 
-    var mItems = [{
-      item: 'black_usb',
-      price: 10,
-      amount: 20
-    },
-    {
-      item: 'beer',
-      price: 500,
-      amount: 22,
-    },
-  ]
+      window.addEventListener('message', function(event){
+          switch(event.data.ui){
+            case 'openui':
+              $('#shop').fadeIn()
+              break;
+            case 'closeui':
+              if(s_Item){
+                $('#sellItemModal').toggle('show')
+              }
+              $('#shop').fadeOut()
+              break;
+          }       
 
-      for(var i = 0; i < sItems.length; i++){
-        console.log(sItems[i].item)
-        $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${sItems[i].item}'><p class='w-10 bg-gray-500 rounded-xl shadow'>${sItems[i].price}$</p><img src='./img/${sItems[i].item}.png' class='mx-auto'><p class='text-black my-1'><span id='itemPrice'>${sItems[i].item}</span> <span id='itemQuantity'>x${sItems[i].amount}</span></p><button class='font-bold bg-green-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-green-500 b_Buy'><i class="fas fa-dollar-sign"></i> Buy</button></div>`).hide().fadeIn(100)
-      }
-
-      $('#addAmount').text(sItems.length)
-      $('#myAmount').text(mItems.length)
+          switch(event.data.shop){
+            case 'setmitems':
+              setUpSell(event.data.data)
+              break;
+            case 'refresh':
+              sItems = JSON.parse(event.data.sItems)
+              mItems = JSON.parse(event.data.mItems)
+              $('#addAmount').text(sItems.length)
+              $('#myAmount').text(mItems.length)
+              refreshItems()
+              break;
+          }
+      })
 
       $('#search').on('keyup', function(){
         $('#shoplist').empty()
@@ -132,53 +41,126 @@ $(function() {
         if(val){
           val = val.toLowerCase();
           $.each(sItems, function(_, obj){
-            if(obj.item.toLowerCase().indexOf(val) != -1){
-              $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${obj.item}'><p class='w-10 bg-gray-500 rounded-xl shadow'>${obj.price}$</p><img src='./img/${obj.item}.png' class='mx-auto'><p class='text-black my-1'>${obj.item} x${obj.amount}</p><button class='font-bold bg-green-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-green-500'><i class="fas fa-dollar-sign b_Buy"></i> Buy</button></div>`).hide().fadeIn(100)
+            if(obj.name.toLowerCase().indexOf(val) != -1){
+              $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${obj.name}'><p class='w-10 bg-gray-500 rounded-xl shadow' id='itemPrice'>${obj.price}$</p><img src='./img/${obj.name}.png' class='mx-auto seller' id='${obj.seller}'><p class='text-black my-1'><span>${obj.label}</span> <span id='itemQuantity'>x${obj.amount}</span></p><button class='font-bold bg-green-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-green-500 b_Buy'><i class="fas fa-dollar-sign"></i> Buy</button></div>`).hide().fadeIn(100)
             }
           })
         }else{
           for(var i = 0; i < sItems.length; i++){
-            console.log(sItems[i].item)
-            $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${sItems[i].item}'><p class='w-10 bg-gray-500 rounded-xl shadow'>${sItems[i].price}$</p><img src='./img/${sItems[i].item}.png' class='mx-auto'><p class='text-black my-1'><span id='itemPrice'>${sItems[i].item}</span> <span id='itemQuantity'>x${sItems[i].amount}</span></p><button class='font-bold bg-green-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-green-500 b_Buy'><i class="fas fa-dollar-sign"></i> Buy</button></div>`).hide().fadeIn(100)
+            $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${sItems[i].name}'><p class='w-10 bg-gray-500 rounded-xl shadow' id='itemPrice'>${sItems[i].price}$</p><img src='./img/${sItems[i].name}.png' class='mx-auto seller' id='${sItems[i].seller}'><p class='text-black my-1'><span>${sItems[i].label}</span> <span id='itemQuantity'>x${sItems[i].amount}</span></p><button class='font-bold bg-green-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-green-500 b_Buy'><i class="fas fa-dollar-sign"></i> Buy</button></div>`).hide().fadeIn(100)
           }
         }
       })
 
-      $('.b_SellItem').on('click', function(){
-        $('#sellItemModal').toggle('show')
-      })
+       $('.b_SellItem').on('click', function(){
+         if(!s_Item){
+          $('#sellItemModal').toggle('show')
+          s_Item = true
+         }else{
+          $('#sellItemModal').toggle('show')
+          s_Item = false
+         }   
+       })
 
       $('.b_SellCancel').on('click', function(){
-        $('#sellItemModal').toggle('show')
+        if(s_Item){
+          $('#sellItemModal').toggle('show')
+          s_Item = false
+         }  
       })
 
-      $('.b_Home').on('click', function(){
-        $('#shoplist').empty()
-        for(var i = 0; i < mItems.length; i++){
-          $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${mItems[i].item}'><p class='w-10 bg-gray-500 rounded-xl shadow'>${mItems[i].price}$</p><img src='./img/${mItems[i].item}.png' class='mx-auto'><p class='text-black my-1'>${mItems[i].item} x${mItems[i].amount}</p><button class='font-bold bg-red-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-red-500 b_Remove'><i class="fas fa-trash"></i> Remove</button>`).hide().fadeIn(100)
+      $('.b_SellAnnounce').on('click', function(){
+        if($('#SsellItems').children(':selected').attr('id') != 'choose'){
+          let _item = $('#SsellItems').children(':selected').attr('id')
+          let _amount = $('#i_Amount').val()
+          let _price = $('#i_Price').val()
+          $.post('http://Boost-OnlineShop/AddItemToShop', JSON.stringify({
+            amount: _amount,
+            price: _price,
+            item: _item
+          }));
+          if(s_Item){
+            $('#sellItemModal').toggle('show')
+            s_Item = false
+          }
         }
       })
 
-      $('.b_Adverts').on('click', function(){
-        $('#shoplist').empty()
-        for(var i = 0; i < sItems.length; i++){
-          $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${sItems[i].item}'><p class='w-10 bg-gray-500 rounded-xl shadow'>${sItems[i].price}$</p><img src='./img/${sItems[i].item}.png' class='mx-auto'><p class='text-black my-1'><span id='itemPrice'>${sItems[i].item}</span> <span id='itemQuantity'>x${sItems[i].amount}</span></p><button class='font-bold bg-green-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-green-500 b_Buy'><i class="fas fa-dollar-sign"></i> Buy</button></div>`).hide().fadeIn(100)
-        }
+       $('.b_Home').on('click', function(){
+         $('#shoplist').empty()
+         for(var i = 0; i < mItems.length; i++){
+          $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${mItems[i].name}'><p class='w-10 bg-gray-500 rounded-xl shadow' id ='itemPrice'>${mItems[i].price}$</p><img src='./img/${mItems[i].name}.png' class='mx-auto'><p class='text-black my-1'>${mItems[i].label} x<span id='itemQuantity'>${mItems[i].amount}</span></p><button class='font-bold bg-red-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-red-500 b_Remove'><i class="fas fa-trash"></i> Remove</button>`).hide().fadeIn(100)
+         }
+       })
+
+       $('.b_Adverts').on('click', function(){
+         $('#shoplist').empty()
+         for(var i = 0; i < sItems.length; i++){
+            $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${sItems[i].name}'><p class='w-10 bg-gray-500 rounded-xl shadow' id='itemPrice'>${sItems[i].price}$</p><img src='./img/${sItems[i].name}.png' class='mx-auto seller' id='${sItems[i].seller}'><p class='text-black my-1'><span>${sItems[i].label}</span> <span id='itemQuantity'>x${sItems[i].amount}</span></p><button class='font-bold bg-green-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-green-500 b_Buy'><i class="fas fa-dollar-sign"></i> Buy</button></div>`).hide().fadeIn(100)
+         }
       })
 
       $('#container').on('click', '.b_Remove',function(){
         let button = $(this)
-        button.parent().remove()
+        let _item = button.parent().get(0).id
+        let _amount = button.parent().find('span#itemQuantity').text()
+        let _price = button.parent().find('p#itemPrice').text()
+        $.post('http://Boost-OnlineShop/RemoveItemFromShop', JSON.stringify({
+          amount: _amount.replace('x', ''),
+          price: _price.replace('$',''),
+          item: _item
+        }), function(removed){
+          if(removed){
+            button.parent().remove()
+          }
+        })
       })
 
       $('#container').on('click', '.b_Buy',function(){
         let button = $(this)
-        console.log(button.parent().get(0).id)
+
+        let _item = button.parent().get(0).id
+        let _amount = button.parent().find(`span:eq(1)`).text()
+        let _price = button.parent().find(`p:eq(0)`).text()
+        let _seller = button.parent().find('img.seller').attr('id')
+
+        $.post('http://Boost-OnlineShop/BuyItemFromShop', JSON.stringify({
+          amount: _amount.replace('x', ''),
+          price: _price.replace('$',''),
+          item: _item,
+          seller: _seller
+        }), function(bought){
+          if(bought){
+            button.parent().remove()
+          }
+        })
       })
 
+      document.onkeyup = function(event){
+        if(event.key == "Escape"){
+          $.post('http://Boost-OnlineShop/CloseUi');
+        }
+      };
     }
 });
 
+// Cia setupinam itemus liste
+function setUpSell(data){
+  var pData = JSON.parse(data)
+  $('#SsellItems').empty()
+  $('#SsellItems').append(`<option id='choose'>Choose an item</option>`)
+  for(var i=0; i < pData.length; i++){
+    $('#SsellItems').append(`<option id='${pData[i].name}'>${pData[i].label} x${pData[i].amount}</option>`)
+  }
+}
+
+function refreshItems(){
+  var pData = sItems
+  $('#shoplist').empty()
+  for(var i=0; i < pData.length; i++){
+     $('#shoplist').append(`<div class='bg-gray-50 rounded-xl p-1 text-center transition-all ease-in-out shadow-xl hover:shadow-2xl b_Item' id='${pData[i].name}'><p class='w-10 bg-gray-500 rounded-xl shadow' id='itemPrice'>${pData[i].price}$</p><img src='./img/${pData[i].name}.png' class='mx-auto seller' id='${pData[i].seller}'><p class='text-black my-1'><span>${pData[i].label}</span> <span id='itemQuantity'>x${pData[i].amount}</span></p><button class='font-bold bg-green-400 rounded-xl p-1 transition-all ease-in-out w-full hover:bg-green-500 b_Buy'><i class="fas fa-dollar-sign"></i> Buy</button></div>`).hide().fadeIn(100)
+  }
+}
 
 
 
