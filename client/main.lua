@@ -10,9 +10,6 @@ Citizen.CreateThread(function()
 end)
 
 Citizen.CreateThread(function()
-    local sleep = 10
-
-
     if Config.UseCommand then
         RegisterCommand('shop', function() 
             OpenShop()
@@ -30,8 +27,9 @@ Citizen.CreateThread(function()
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentString('Online Shop')
     EndTextCommandSetBlipName(blip)
-     
+end)
 
+Citizen.CreateThread(function()
     while true do
         Wait(10)
         local playerPed = PlayerPedId()
@@ -43,6 +41,8 @@ Citizen.CreateThread(function()
                     OpenShop()
                 end
             end
+        else
+            Wait(100)
         end
     end
 
