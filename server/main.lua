@@ -31,6 +31,11 @@ ESX.RegisterServerCallback('Boost-OnlineShop:CanCarryItem', function(source, cb,
     end
 end)
 
+ESX.RegisterServerCallback('Boost-OnlineShop:GetItemAmount', function(source, cb, item)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    cb(xPlayer.getInventoryItem(item).count)
+end)
+
 ESX.RegisterServerCallback('Boost-OnlineShop:GetShopItems', function(source, cb)
     local _source = source
     local xPlayer = ESX.GetPlayerFromId(_source)
@@ -73,6 +78,8 @@ RegisterServerEvent('Boost-OnlineShop:AddItemToShop', function(data)
         })
         xPlayer.removeInventoryItem(tostring(data.item), tonumber(data.amount))
         TriggerClientEvent('Boost-OnlineShop:RefreshShop', _source)
+    else
+        print('Cheateer cheater')
     end
 end)
 

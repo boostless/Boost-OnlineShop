@@ -34,9 +34,10 @@ Citizen.CreateThread(function()
         Wait(10)
         local playerPed = PlayerPedId()
         local coords = GetEntityCoords(playerPed)
-        if #(coords - Config.Shop.location) < 5.0 then
+        local distance = #(coords - Config.Shop.location)
+        if distance < 5.0 then
             DrawMarker(Config.Shop.marker.type, Config.Shop.location.x, Config.Shop.location.y, Config.Shop.location.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, Config.Shop.marker.color.r, Config.Shop.marker.color.g, Config.Shop.marker.color.b, Config.Shop.marker.color.a, false, false, 2, nil, nil, false, false)
-            if #(coords - Config.Shop.location) < 1.5 then
+            if distance < 1.5 then
                 if IsControlJustReleased(1, 38) and not uiOpen then
                     OpenShop()
                 end
@@ -58,8 +59,21 @@ RegisterNUICallback('CloseUi', function()
     CloseUi()
 end)
 
-RegisterNUICallback('AddItemToShop', function(data)
-    TriggerServerEvent('Boost-OnlineShop:AddItemToShop', data)
+RegisterNUICallback('AddItemToShop', function(data, cb)
+    ESX.TriggerServerCallback('Boost-OnlineShop:GetItemAmount', function(count)
+        if tonumber(data.amount) > count then
+            ESX.ShowNotification("You don't have enought of this item")
+            cb(false)
+        else
+            if tonumber(data.amount) >= 0 and tonumber(data.price) >= 0 then
+                TriggerServerEvent('Boost-OnlineShop:AddItemToShop', data)
+                cb(true)
+            else
+                ESX.ShowNotification('Invalid price or amount')
+                cb(false)
+            end
+        end
+    end, data.item)
 end)
 
 RegisterNUICallback('BuyItemFromShop', function(data, cb)

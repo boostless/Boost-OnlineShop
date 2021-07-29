@@ -78,11 +78,14 @@ $(function() {
             amount: _amount,
             price: _price,
             item: _item
-          }));
-          if(s_Item){
-            $('#sellItemModal').toggle('show')
-            s_Item = false
-          }
+          }), function(added){
+            if(added){
+              if(s_Item){
+                $('#sellItemModal').toggle('show')
+                s_Item = false
+              }
+            }
+          });
         }
       })
 
@@ -112,6 +115,7 @@ $(function() {
         }), function(removed){
           if(removed){
             button.parent().remove()
+            $('#myAmount').text(parseInt($('#myAmount').text() - 1))
           }
         })
       })
